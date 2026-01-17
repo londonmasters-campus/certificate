@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Certificate Download</title>
+</head>
+<body>
+
+  <h2>Certificate Download</h2>
+
+  <input type="text" id="name" placeholder="Your Name">
+  <br><br>
+
+  <button onclick="generateCertificate()">Download Certificate</button>
+
+  <script>
+    function generateCertificate() {
+
+      const name = document.getElementById("name").value.trim();
+
+      if (name === "") {
+        alert("Nama enter karanna");
+        return;
+      }
+
+      // ===== OYA WEB APP URL EKA MEHETA DAPAN =====
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjNxiOxWQ84fQr5d6ECe9Qt1_6K9ulraZqJ3MW0X1XmaHpx-9hCJJetcXKEl0Dg6HSTQ/exec";
+
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "name=" + encodeURIComponent(name)
+      })
+      .then(response => response.json())
+      .then(data => {
+        window.location.href = data.url;
+      })
+      .catch(err => {
+        alert("Error ekak una. Aye try karanna.");
+      });
+    }
+  </script>
+
+</body>
+</html>
