@@ -1,45 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Certificate Download</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #status {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
 
-  <h2>Certificate Download</h2>
+  <div class="box">
+    <h2>Certificate Download</h2>
 
-  <input type="text" id="name" placeholder="Your Name">
-  <br><br>
+    <input type="text" id="name" placeholder="Enter your name">
 
-  <button onclick="generateCertificate()">Download Certificate</button>
+    <button onclick="generateCertificate()">Download Certificate</button>
+
+    <div id="status"></div>
+  </div>
 
   <script>
     function generateCertificate() {
 
       const name = document.getElementById("name").value.trim();
+      const status = document.getElementById("status");
 
-      if (name === "") {
+      if (!name) {
         alert("Nama enter karanna");
         return;
       }
 
-      // ===== OYA WEB APP URL EKA MEHETA DAPAN =====
+      status.innerText = "Generating certificate...";
+
+      // ✅ YOUR GOOGLE APPS SCRIPT WEB APP URL
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjNxiOxWQ84fQr5d6ECe9Qt1_6K9ulraZqJ3MW0X1XmaHpx-9hCJJetcXKEl0Dg6HSTQ/exec";
 
-      fetch(WEB_APP_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: "name=" + encodeURIComponent(name)
-      })
-      .then(response => response.json())
-      .then(data => {
-        window.location.href = data.url;
-      })
-      .catch(err => {
-        alert("Error ekak una. Aye try karanna.");
-      });
+      const finalUrl =
+        WEB_APP_URL +
+        "?test=cert&name=" +
+        encodeURIComponent(name);
+
+      fetch(finalUrl)
+        .then(response => response.json())
+        .then(data => {
+
+          if (data.status === "success") {
+            status.innerHTML =
+              "Certificate ready. <br><a href='" +
+              data.url +
+              "' target='_blank'>Click here to download</a>";
+          } else {
+            status.innerText = "Error: " + data.message;
+          }
+
+        })
+        .catch(error => {
+          status.innerText = "Frontend error: " + error;
+        });
     }
   </script>
 
