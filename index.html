@@ -1,63 +1,126 @@
 <!DOCTYPE html>
-<html>
+<html lang="si">
 <head>
   <meta charset="UTF-8">
   <title>Certificate Download</title>
+
   <style>
     body {
-      font-family: Arial;
-      background: #f4f4f4;
-      height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
       display: flex;
       justify-content: center;
       align-items: center;
+      height: 100vh;
     }
+
     .box {
-      background: #fff;
+      background: #ffffff;
       padding: 30px;
+      border-radius: 10px;
       width: 320px;
-      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       text-align: center;
     }
-    input, button {
+
+    input {
       width: 100%;
       padding: 10px;
-      margin-top: 10px;
+      margin-bottom: 15px;
       font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background: #0066cc;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+
+    .msg {
+      margin-top: 15px;
+      font-size: 14px;
     }
   </style>
 </head>
+
 <body>
 
-<div class="box">
-  <h2>Certificate Download</h2>
+  <div class="box">
+    <h2>Certificate Download</h2>
 
-  <input type="text" id="name" placeholder="Enter your name">
+    <input
+      type="text"
+      id="name"
+      placeholder="ඔයාගේ නම ඇතුල් කරන්න"
+    />
 
-  <button onclick="downloadCert()">Download Certificate</button>
-</div>
+    <button id="btn" onclick="downloadCertificate()">
+      Download Certificate
+    </button>
 
-<script>
-  function downloadCert() {
+    <div class="msg" id="msg"></div>
+  </div>
 
-    const name = document.getElementById("name").value.trim();
-
-    if (!name) {
-      alert("Nama enter karanna");
-      return;
-    }
-
-    // ✅ GOOGLE APPS SCRIPT WEB APP URL
-    const WEB_APP_URL =
+  <script>
+    const SCRIPT_URL =
       "https://script.google.com/macros/s/AKfycbw8R3NHZQ_BKanokYwpnCM49K8TLKnthQXtbXmSlhmEysLssdFoa4UuxuirEh80Cbq-Kg/exec";
 
-    // 🔥 DIRECT REDIRECT (NO CORS ISSUE)
-    window.location.href =
-      WEB_APP_URL +
-      "?test=cert&name=" +
-      encodeURIComponent(name);
-  }
-</script>
+    function downloadCertificate() {
+
+      const name = document.getElementById("name").value.trim();
+      const msg = document.getElementById("msg");
+      const btn = document.getElementById("btn");
+
+      if (name === "") {
+        msg.innerText = "කරුණාකර නම ඇතුල් කරන්න";
+        msg.style.color = "red";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Please wait...";
+      msg.innerText = "Certificate generate වෙමින් පවතී...";
+      msg.style.color = "black";
+
+      const url =
+        SCRIPT_URL +
+        "?test=cert&name=" +
+        encodeURIComponent(name);
+
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+
+          if (data.status === "success") {
+            msg.innerText = "Download එක ආරම්භ වෙයි...";
+            msg.style.color = "green";
+            window.open(data.url, "_blank");
+          } else {
+            msg.innerText = "Certificate generate වෙන්න බැරි උනා";
+            msg.style.color = "red";
+          }
+
+          btn.disabled = false;
+          btn.innerText = "Download Certificate";
+        })
+        .catch(err => {
+          msg.innerText = "Error එකක් උනා. නැවත උත්සාහ කරන්න";
+          msg.style.color = "red";
+          btn.disabled = false;
+          btn.innerText = "Download Certificate";
+        });
+    }
+  </script>
 
 </body>
 </html>
